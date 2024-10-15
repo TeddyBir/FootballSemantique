@@ -1,0 +1,57 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX bbc: <http://www.bbc.co.uk/ontologies/sport/>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT {
+    ?homeTeam  rdf:type dbo:FootballTeam;
+               dbo:country ?homeCountry;
+               dbo:fifaRank ?homeTeamFifaRank;
+               dbo:fifaPoints ?homeTeamScore.
+    
+    ?awayTeam  rdf:type dbo:FootballTeam;
+               dbo:country ?awayCountry;
+               dbo:fifaRank ?awayTeamFifaRank;
+               dbo:fifaPoints ?awayTeamScore.
+               
+    ?match ex:hasHomeTeam ?homeTeam;
+           ex:hasAwayTeam ?awayTeam;
+           dbo:date ?date;
+           ex:homeTeamScore ?homeTeamScore;
+           ex:awayTeamScore ?awayTeamScore;
+           ex:shootOut ?shootOut;
+           ex:homeTeamResult ?homeTeamResult;
+           ex:tournament ?tournament;
+           rdf:type bbc:Match.
+}
+FROM <international_matches.csv#encoding=utf-8;header=present;delimiter=comma> 
+WHERE {
+    BIND (xsd:integer(?home_team_fifa_rank) AS ?homeTeamFifaRank).
+    BIND (xsd:integer(?away_team_fifa_rank) AS ?awayTeamFifaRank).
+    BIND (xsd:integer(?home_team_score) AS ?homeTeamScore).
+    BIND (xsd:integer(?away_team_score) AS ?awayTeamScore).
+    BIND (xsd:date(?date) AS ?dateValue).
+
+    BIND (IF(?shoot_out = "Yes", true, false) AS ?shootOut).
+
+    BIND (
+        IF(?homeTeamScore> ?awayTeamScore, "Win", 
+        IF(?homeTeamScore< ?awayTeamScore, "Lose", "Draw")) AS ?homeTeamResult
+    ).
+    
+    BIND (REPLACE(?tournament, " ", "_") AS ?safeTournament).
+    BIND (REPLACE(?home_team_country, " ", "_") AS ?safeHomeTeamCountry).
+    BIND (REPLACE(?away_team_country, " ", "_") AS ?safeAwayTeamCountry).
+    BIND (REPLACE(?country, " ", "_") AS ?safeCountry).
+    BIND (REPLACE(?home_team, " ", "_") AS ?safeHomeTeam).
+    BIND (REPLACE(?away_team, " ", "_") AS ?safeAwayTeam).
+    
+
+    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeHomeTeamCountry))) AS ?homeCountry).
+    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeAwayTeamCountry))) AS ?awayCountry).
+
+    BIND (URI(CONCAT("http://www.example.org/football/team/", STR(?safeHomeTeam))) AS ?homeTeam).
+    BIND (URI(CONCAT("http://www.example.org/football/team/", STR(?safeAwayTeam))) AS ?awayTeam).
+    BIND (URI(CONCAT("http://www.example.org/football/match/", STR(?safeHomeTeam), "/", STR(?safeTournament), "/", STR(?date))) AS ?match).
+}
