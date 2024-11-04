@@ -1,0 +1,18 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+# Calcul de la moyenne de buts durant la Coupe du Monde de 2018
+SELECT (AVG(?homeScore + ?awayScore) AS ?averageGoals)
+WHERE {
+  # Sélection des matchs de la Coupe du Monde 2018
+  ?match ex:tournament "FIFA World Cup";
+         dbo:date ?date;
+         ex:homeTeamScore ?homeScore;
+         ex:awayTeamScore ?awayScore.
+  
+  # Filtre des dates pour les matchs de la coupe du monde 2018
+  FILTER(?date >= "2018-06-14" && ?date <= "2018-07-15")
+}
+

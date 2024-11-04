@@ -1,0 +1,32 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+# Pays ayant le plus de victoires en Coupe du Monde depuis 2014
+SELECT ?country (COUNT(?match) AS ?winCount)
+WHERE {
+  # Sélection des matchs de la Coupe du Monde depuis 2014
+  ?match ex:tournament "FIFA World Cup";
+         dbo:date ?date.
+
+  # Filtre des dates pour les matchs depuis 2014
+  FILTER(?date >= "2014-01-01")
+
+  # Récupération du pays gagnant en fonction du résultat
+  {
+    ?match ex:homeTeamResult "Win";
+           ex:hasHomeTeam ?team.
+    ?team dbo:country ?country.
+  }
+    UNION
+  {
+    ?match ex:homeTeamResult "Lose";
+           ex:hasAwayTeam ?team.
+    ?team dbo:country ?country.
+  }
+}
+GROUP BY ?country
+ORDER BY DESC(?winCount)
+LIMIT 1
+

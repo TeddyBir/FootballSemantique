@@ -1,0 +1,56 @@
+PREFIX http: <http://www.w3.org/2011/http#>
+PREFIX schema: <http://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+# Pays ayant le plus de victoires en Coupe du Monde depuis 2014 et le nombre personne ayant reçu une médaille d'or en 2024
+SELECT ?countryName ?winCount ?winMedal
+WHERE {
+  # Sous-requête pour compter les victoires
+  {
+    SELECT ?countryName (COUNT(?match) AS ?winCount)
+    WHERE {
+      # Sélection des matchs de la Coupe du Monde depuis 2014
+      ?match ex:tournament "FIFA World Cup"; 
+             dbo:date ?date.
+      FILTER(?date >= "2014-01-01")
+
+      # Récupération du pays gagnant en fonction du résultat
+      {
+        ?match ex:homeTeamResult "Win";
+               ex:hasHomeTeam ?team.
+        ?team dbo:country ?country;
+              schema:name ?countryName.
+      }
+      UNION
+      {
+        ?match ex:homeTeamResult "Lose";
+               ex:hasAwayTeam ?team.
+        ?team dbo:country ?country;
+              schema:name ?countryName.
+      }
+    }
+    GROUP BY ?countryName
+  }
+  
+  # Sous-requête pour compter les médailles d'or en 2024
+  {
+    SELECT ?countryName (COUNT(DISTINCT ?medal) AS ?winMedal)
+    WHERE {
+      SERVICE <http://127.0.0.1:3030/medalist2024/query> {
+        # Récupération des médailles d'or par personne.
+        ?people ex:won_medal ?medal;
+                dbo:country ?countryMedal.
+        ?medal ex:medal_type "gold" .
+        
+        ?countryMedal schema:name ?countryName .
+      }
+    }
+    GROUP BY ?countryName
+  }
+}
+ORDER BY DESC(?winCount)
+LIMIT 10
+

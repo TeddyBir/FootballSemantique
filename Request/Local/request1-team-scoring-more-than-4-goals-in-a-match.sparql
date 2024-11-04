@@ -1,0 +1,30 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+# Affichage des pays ayant marqué plus de 4 buts dans un match
+SELECT ?country ?goals
+WHERE {
+  {
+    # Récupération des scores pour les équipes à domicile
+    ?match ex:homeTeamScore ?goals;
+       ex:hasHomeTeam ?homeTeam.
+    ?homeTeam dbo:country ?country.
+
+    # Filtre pour les scores supérieurs à 4
+    FILTER(?goals > 4)
+  }
+  UNION
+  {
+    # Récupération des scores pour les équipes à l'extérieur
+    ?match ex:awayTeamScore ?goals;
+       ex:hasHomeTeam ?awayTeam.
+    ?awayTeam dbo:country ?country.
+
+    # Filtre pour les scores supérieurs à 4
+    FILTER (?goals > 4)
+  }
+}
+
+ORDER BY DESC(?goals)

@@ -1,0 +1,32 @@
+PREFIX ex: <http://example.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+
+SELECT ?countryName (COUNT(DISTINCT ?milionnaire) AS ?TotalMillionaires)
+WHERE {
+  # Récupération des pays ayant marqué plus de 13 buts sur un même match depuis 1993
+  {
+    ?match dbo:date ?date;
+           ex:homeTeamScore ?homeScore;
+           ex:hasHomeTeam ?homeTeam.
+    ?homeTeam dbo:country ?countryName.
+    FILTER(?homeScore > 13 && ?date >= "1993-01-01")
+  }
+  UNION
+  {
+    ?match dbo:date ?date;
+           ex:awayTeamScore ?awayScore;
+           ex:hasAwayTeam ?awayTeam.
+    ?awayTeam dbo:country ?countryName.
+    FILTER(?awayScore > 13 && ?date >= "1993-01-01")
+  }
+
+  # Liaison avec les données du groupe 5
+  SERVICE <http://127.0.0.1:3030/bilionaire/query> {
+    ?milionnaire dbo:location ?countryName;
+  }
+}
+GROUP BY ?countryName
+ORDER BY DESC(?TotalMillionaires)
+
