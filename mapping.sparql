@@ -3,15 +3,18 @@ PREFIX bbc: <http://www.bbc.co.uk/ontologies/sport/>
 PREFIX ex: <http://example.org/>
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX schema:  <http://schema.org/>
 
 CONSTRUCT {
     ?homeTeam  rdf:type dbo:FootballTeam;
                dbo:country ?homeCountry;
+               schema:name  ?home_team;
                dbo:fifaRank ?homeTeamFifaRank;
                dbo:fifaPoints ?homeTeamScore.
     
     ?awayTeam  rdf:type dbo:FootballTeam;
                dbo:country ?awayCountry;
+               schema:name  ?away_team;
                dbo:fifaRank ?awayTeamFifaRank;
                dbo:fifaPoints ?awayTeamScore.
                
@@ -48,8 +51,8 @@ WHERE {
     BIND (REPLACE(?away_team, " ", "_") AS ?safeAwayTeam).
     
 
-    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeHomeTeamCountry))) AS ?homeCountry).
-    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeAwayTeamCountry))) AS ?awayCountry).
+    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeHomeTeam))) AS ?homeCountry).
+    BIND (URI(CONCAT("http://dbpedia.org/resource/", STR(?safeAwayTeam))) AS ?awayCountry).
 
     BIND (URI(CONCAT("http://www.example.org/football/team/", STR(?safeHomeTeam))) AS ?homeTeam).
     BIND (URI(CONCAT("http://www.example.org/football/team/", STR(?safeAwayTeam))) AS ?awayTeam).
