@@ -4,6 +4,8 @@
 @prefix  dcterms: <http://purl.org/dc/terms/> .
 @prefix foaf: <http://xmlns.com/foaf/0.1/> .
 @prefix dbo: <http://dbpedia.org/ontology/> .
+@prefix bbc:  <http://www.bbc.co.uk/ontologies/sport/> .
+@prefix ex:  <http://example.org/> .
 
  : Fifa World Cup a void:Dataset ;
   dcterms:title "Dataset FIFA enrichi" ;
