@@ -19,7 +19,7 @@
 
 [FIFA World Cup 2022](https://docs.google.com/presentation/d/1BNisxatLEKinKzBFFgWqPRKdb9diYhNhpDNfIZ_UG2Y/edit#slide=id.g3048c090801_4_105)
 
-# installation 
+# Installation 
 To be able to use our RDF dataset the installation of a Fuseki server is needed. 
 Download : 
   - https://jena.apache.org/download/index.cgi
