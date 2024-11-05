@@ -1,0 +1,78 @@
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX http: <http://www.w3.org/2011/http#>
+PREFIX schema: <http://schema.org/>
+PREFIX schema2: <https://schema.org/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX ex: <http://example.org/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX exm: <http://example.org/movie/> 
+
+# Pays ayant le plus de victoires au foot en 2018, le pilote ayant le plus de victoires pour ce pays, et les films ayant remporté un Oscar.
+SELECT ?country ?nameCountry ?winCount ?pilotName ?movie ?maxMovie ?netflixMovieCount
+WHERE {
+  # Sous-requête pour compter les victoires de chaque pays en 2018.
+  {
+    SELECT ?country ?nameCountry (COUNT(?match) AS ?winCount)
+    WHERE {
+      # Sélection des matchs en 2018
+      ?match dbo:date ?date .
+      FILTER(?date >= "2018-01-01" && ?date <= "2018-12-31")
+
+      # Récupération du pays gagnant en fonction du résultat
+      {
+        ?match ex:homeTeamResult "Win";
+               ex:hasHomeTeam ?team .
+        ?team dbo:country ?country ;
+              schema:name ?nameCountry .
+      }
+      UNION
+      {
+        ?match ex:homeTeamResult "Lose";
+               ex:hasAwayTeam ?team .
+        ?team dbo:country ?country ;
+              schema:name ?nameCountry .
+      }
+    }
+    GROUP BY ?country ?nameCountry
+    ORDER BY DESC(?winCount)
+    LIMIT 1
+  }
+  
+  # Sous-requête pour obtenir le pilote avec le plus de victoires, originaire du pays ayant le plus de victoires en 2018
+  {
+    SELECT ?pilotName (MAX(?wins) AS ?maxWins)
+    WHERE {
+      SERVICE <http://127.0.0.1:3030/formula/query> {
+        ?p a foaf:Person ;
+           dbo:wins ?wins ;
+           schema2:countryOfOrigin ?country ;
+           foaf:name ?pilotName .
+      }
+    }
+    GROUP BY ?pilotName
+    ORDER BY DESC(?maxWins)
+    LIMIT 1
+  }
+  
+  # Sous-requête pour obtenir chaque film ayant remporté un Oscar et provenant du pays en question. Deplus donne le nombre appartenant à Netflix.
+  {
+    SELECT ?movie (COUNT(?movie) AS ?maxMovie)  (COUNT(?netflixMovie) AS ?netflixMovieCount)
+    WHERE {
+      SERVICE <http://127.0.0.1:3030/oscar/query> {
+        ?movie a dbo:Movie ;
+               dbo:country ?country ;
+               exm:winner "Yes" .
+      }
+      OPTIONAL {
+        SERVICE <http://127.0.0.1:3030/netflix/query> {
+          ?netflixMovie a schema:Movie ;
+                         schema:name ?movieTitle .
+        }
+      }
+    }
+    GROUP BY ?movie ?country
+  }
+}
+LIMIT 1
+
