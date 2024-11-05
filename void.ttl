@@ -1,0 +1,58 @@
+@prefix void: <http://rdfs.org/ns/void#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix  dcterms: <http://purl.org/dc/terms/> .
+@prefix foaf: <http://xmlns.com/foaf/0.1/> .
+@prefix dbo: <http://dbpedia.org/ontology/> .
+
+ : Fifa World Cup a void:Dataset ;
+  dcterms:title "Dataset FIFA enrichi" ;
+  dcterms:description "Dataset provdes an overview of all international soccer matches played since the 90s." ;
+  dcterms:source "https://www.kaggle.com/datasets/brenda89/fifa-world-cup-2022" ; 
+  dcterms:modified "2024-11-05"^^xsd:date ; 
+  dcterms:creator [
+    foaf:name "REPPERT William" ;
+    foaf:mbox "william.reppert@etu.univ-nantes.fr" ;
+    foaf:schoolHomepage <http://www.univ-nantes.fr/> ;
+    rdfs:comment "M1 Alma student."
+  ] ;
+  dcterms:creator [
+    foaf:name "POULALION Maxime" ;
+    foaf:mbox "maxime.poulalion@etu.univ-nantes.fr" ;
+    foaf:schoolHomepage <http://www.univ-nantes.fr/> ;
+    rdfs:comment "M1 Alma student."
+  ] ;
+  dcterms:creator [
+    foaf:name "CUSSAGUET Erwann" ;
+    foaf:mbox "maxime.poulalion@etu.univ-nantes.fr" ;
+    foaf:schoolHomepage <http://www.univ-nantes.fr/> ;
+    rdfs:comment "M1 Alma student."
+  ] ;
+  dcterms:creator [
+    foaf:name "RAMAHEFARINAIVO Stéphane" ;
+    foaf:mbox "stephane.ramahefarinaivo@etu.univ-nantes.fr" ;
+    foaf:schoolHomepage <http://www.univ-nantes.fr/> ;
+    rdfs:comment "M1 Alma student."
+  ] ;
+
+:groupeAlma13 rdf:type foaf:Organization;
+    rdfs:label "Université de Nantes"
+    foaf:homepage <http://www.univ-nantes.fr/>.
+
+void:classes 2;
+void:proprietes 11;
+
+void:classPartition [void:class dbo:FootballTeam; ];
+void:classPartition [void:class bbc:Match; ];
+
+void:propertyPartition [void:property dbo:country; ];
+void:propertyPartition [void:property dbo:fifarank; ];
+void:propertyPartition [void:property dbo:fifapoints; ];
+void:propertyPartition [void:property ex:hasHomeTeam; ];
+void:propertyPartition [void:property ex:hasAwayTeam; ];
+void:propertyPartition [void:property dbo:date; ];
+void:propertyPartition [void:property ex:homeTeamScore; ];
+void:propertyPartition [void:property ex:awayTeamScore; ];
+void:propertyPartition [void:property ex:shoutOut; ];
+void:propertyPartition [void:property ex:HomeTeamResult; ];
+void:propertyPartition [void:property ex:tournament; ];
